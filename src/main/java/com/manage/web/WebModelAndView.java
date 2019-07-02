@@ -20,7 +20,6 @@ public class WebModelAndView {
     @RequestMapping(value = "index.htm", method = RequestMethod.GET, produces = "text/html;charset=UTF-8")
     public ModelAndView adminLogin(HttpServletRequest request) {
         ModelAndView mv = new ModelAndView("web/index");
-        mv.addObject("key",111);
 
         return mv;
     }
@@ -31,6 +30,4 @@ public class WebModelAndView {
 
         return mv;
     }
-
-
 }
