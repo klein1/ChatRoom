@@ -1,0 +1,29 @@
+<div id="menu">
+    <ul id="nav">
+        <li class="mainlevel" id="">
+            <a href="/index.htm" class="menu2">首  页</a>
+        </li>
+        <li class="mainlevel" id="">
+            <a href="/news_list.htm?state=1" class="menu2">通知公告</a>
+        </li>
+        <li class="mainlevel" id="">
+            <a href="/news_list.htm?state=2" class="menu2">新闻快报</a>
+        </li>
+        <li class="mainlevel" id="">
+            <a href="/news_list.htm?state=3" class="menu2">成果巡礼</a>
+        </li>
+        <li class="mainlevel" id="">
+            <a href="/news_list.htm?state=4" class="menu2">党员风采</a>
+        </li>
+        <li class="mainlevel" id="">
+            <a href="/news_list.htm?state=5" class="menu2">历届回顾</a>
+        </li>
+        <li class="mainlevel" id="">
+            <a href="/news_list.htm?state=6" class="menu2">大会影像</a>
+        </li>
+        <li class="mainlevel" id="" style="background-image: none">
+            <a href="/news_list.htm?state=7" class="menu2">大会简报</a>
+        </li>
+        <div class="clear"></div>
+    </ul>
+</div>

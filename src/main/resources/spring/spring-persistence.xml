@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="
+	http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+	http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+	http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
+
+	<!--配置数据源-->
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
+		destroy-method="close">
+		<property name="driverClassName" value="${db.mysql.driverClass}" />
+		<property name="url" value="${db.conn.url}" />
+		<property name="username" value="${db.conn.userName}" />
+		<property name="password" value="${db.conn.password}" />
+
+		<property name="maxActive" value="${db.conn.maxActive}"></property>
+		<property name="maxIdle" value="${db.conn.maxIdle}"></property>
+		<property name="maxWait" value="${db.conn.maxWait}"></property>
+		<property name="minIdle" value="${db.conn.minIdle}"></property>
+
+		<property name="testOnBorrow" value="true"></property>
+		<property name="testWhileIdle" value="true"></property>
+		<property name="validationQuery" value="select 1 from dual"></property>
+
+		<property name="defaultAutoCommit" value="${db.conn.autocommit}"></property>
+		<property name="removeAbandoned" value="${db.conn.removeAbandoned}"></property>
+		<property name="removeAbandonedTimeout" value="${db.conn.removeAbandonedTimeout}"></property>
+		<property name="logAbandoned" value="false"></property>
+
+		<!-- 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->
+		<property name="timeBetweenEvictionRunsMillis" value="${db.conn.timeBetweenEvictionRunsMillis}"></property>
+		<!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->
+		<property name="minEvictableIdleTimeMillis" value="${db.conn.minEvictableIdleTimeMillis}"></property>
+	</bean>
+
+	<bean id="dataSource2" class="org.apache.commons.dbcp.BasicDataSource"
+		  destroy-method="close">
+		<property name="driverClassName" value="${db.mysql.driverClass}" />
+		<property name="url" value="${db2.conn.url}" />
+		<property name="username" value="${db.conn.userName}" />
+		<property name="password" value="${db.conn.password}" />
+
+		<property name="maxActive" value="${db.conn.maxActive}"></property>
+		<property name="maxIdle" value="${db.conn.maxIdle}"></property>
+		<property name="maxWait" value="${db.conn.maxWait}"></property>
+		<property name="minIdle" value="${db.conn.minIdle}"></property>
+
+		<property name="testOnBorrow" value="true"></property>
+		<property name="testWhileIdle" value="true"></property>
+		<property name="validationQuery" value="select 1 from dual"></property>
+
+		<property name="defaultAutoCommit" value="${db.conn.autocommit}"></property>
+		<property name="removeAbandoned" value="${db.conn.removeAbandoned}"></property>
+		<property name="removeAbandonedTimeout" value="${db.conn.removeAbandonedTimeout}"></property>
+		<property name="logAbandoned" value="false"></property>
+
+		<!-- 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->
+		<property name="timeBetweenEvictionRunsMillis" value="${db.conn.timeBetweenEvictionRunsMillis}"></property>
+		<!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->
+		<property name="minEvictableIdleTimeMillis" value="${db.conn.minEvictableIdleTimeMillis}"></property>
+	</bean>
+
+	<!--配置统一的数据源-->
+	<bean id="dynamicDataSource" class="com.manage.web.Config.DynamicDataSource">
+		<property name="targetDataSources">
+		<map key-type="java.lang.String">
+				<entry value-ref="dataSource" key="dataSource"></entry>
+				<entry value-ref="dataSource2" key="dataSource2"></entry>
+			</map>
+		</property>
+		<property name="defaultTargetDataSource" ref="dataSource" >
+		</property>
+	</bean>
+
+
+	<bean id="sqlSessionFactory" name="h5SqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dynamicDataSource" />
+		<property name="typeAliasesPackage" value="com.manage.common.domain" />
+		<property name="mapperLocations">
+			<list>
+				<value>classpath:Mapper/**/*Mapper.xml</value>
+			</list>
+		</property>
+	</bean>
+
+	<!-- scan for mappers and let them be autowired -->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="com.manage.common.dao" />
+        <property name="sqlSessionFactoryBeanName" value="h5SqlSessionFactory"/>
+	</bean>
+
+	<!-- 可通过注解控制事务 -->
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+    
+    <!-- (事务管理)transaction manager, use JtaTransactionManager for global tx -->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dynamicDataSource" />
+    </bean>
+    
+    <!-- 配置事务的传播特性 -->
+    <tx:advice id="txAdvice" transaction-manager="transactionManager">
+        <tx:attributes>
+        	<tx:method name="*" propagation="SUPPORTS" read-only="true" />
+            <tx:method name="create*" propagation="REQUIRED" rollback-for="Exception" />
+            <tx:method name="add*" propagation="REQUIRED" rollback-for="Exception" />
+            <tx:method name="insert*" propagation="REQUIRED" rollback-for="Exception" />
+            <tx:method name="update*" propagation="REQUIRED" rollback-for="Exception" />
+            <tx:method name="delete*" propagation="REQUIRED" rollback-for="Exception" />
+        </tx:attributes>
+    </tx:advice>
+    <!-- 配置事务的切入点 -->
+    <aop:config>
+        <aop:pointcut id="targetMethod" expression="execution(* com.manage.common.impl..*ServiceImpl.*(..))" />
+        <aop:advisor advice-ref="txAdvice" pointcut-ref="targetMethod" />
+    </aop:config>
+     
+</beans>

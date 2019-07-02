@@ -1,0 +1,16 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.manage.common.dao.AdminMapper">
+    <resultMap id="adminResultMap" type="com.manage.common.domain.Admin">
+        <id column="admin_id" property="adminId"/>
+        <result column="admin_no" property="adminNo"/>
+        <result column="password" property="password"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="state" property="state"/>
+    </resultMap>
+
+    <!--根据管理员编号查询管理员信息-->
+    <select id="selectAdminByAdminNo" parameterType="java.lang.String" resultMap="adminResultMap">
+        SELECT * FROM db_admin WHERE admin_no = #{adminNo} AND state = 1
+    </select>
+</mapper>
